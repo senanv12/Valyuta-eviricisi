@@ -1,0 +1,139 @@
+const key = '3239d9e1d5a785f2bdcbd999';
+let data = {};
+let from = 'USD';
+let to = 'RUB';
+let convert = false;
+let currBtn = document.querySelectorAll(".buttons")
+let inputCrr = document.querySelectorAll(".inputext")
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelector('.fromInp').value = 1;
+    document.querySelector('.toInp').value = 0;
+    getData();
+    document.querySelectorAll('.buttons').forEach(b => {
+        b.addEventListener('click', btn);
+    });
+    document.querySelectorAll('.inputext').forEach(i => {
+        i.addEventListener('input', inputChange);
+    });
+});
+
+//api istifadə etmək üçün
+function getData() {
+    fetch(`https://v6.exchangerate-api.com/v6/${key}/latest/USD`)
+        .then(r => r.json())
+        .then(d => {
+            if (d.result === 'success') {
+                data.USD = 1;
+                data.EUR = d.conversion_rates.EUR;
+                data.GBP = d.conversion_rates.GBP;
+                data.RUB = d.conversion_rates.RUB;
+                convertSide('l');
+                document.querySelector('.checkwifi').style.display = 'none';
+            } else {
+                document.querySelector('.checkwifi').style.display = 'block';
+            }
+        })
+        .catch(() => {
+            document.querySelector('.checkwifi').style.display = 'block';
+        });
+}
+
+
+// Aşağıdakı balaca məlumat yeri üçün
+function rateText() {
+    let a = document.querySelector('.from .currency-info');
+    let b = document.querySelector('.to .currency-info');
+    let rateAtoB = change(1, from, to);
+    let rateBtoA = change(1, to, from);
+    a.innerHTML = `1 ${from} = ${formatNumber(rateAtoB)} ${to}`
+    b.innerHTML = `1 ${to} = ${formatNumber(rateBtoA)} ${from}`
+}
+
+
+function change(value, to, from) {
+    if (to == from) {
+        return value;
+    }
+
+
+    if (!data[to] || !data[from]) {
+        return 0;
+    }
+
+    let inUSD = value / data[to];
+    return inUSD * data[from];
+}
+
+
+
+//yuvarlaşdırmaq
+function formatNumber(num) {
+    return Math.round(num * 100000) / 100000;
+}
+
+
+//əsas çevrilmə işi burdadı
+function convertSide(side) {
+    if (convert) return;
+    convert = true;
+    let fromInp = document.querySelector('.fromInp');
+    let toInp = document.querySelector('.toInp');
+    if (side == 'l') {
+        let val = Number(fromInp.value.replace(',', '.'));
+        if (isNaN(val)) val = 0;
+        let result = change(val, from, to);
+        toInp.value = formatNumber(result);
+    } else {
+        let val = Number(toInp.value.replace(',', '.'));
+        if (isNaN(val)) val = 0;
+        let result = change(val, to, from);
+        fromInp.value = formatNumber(result);
+    }
+    rateText();
+    convert = false;
+}
+
+
+
+
+// Düymələrə basanda rəngini dəyişmək üçün **parentElementi arasdirdim
+function btn(e) {
+    if (!e.target.classList.contains('btn')) return;
+    e.target.parentElement.querySelectorAll('.btn').forEach(x => {
+        x.classList.remove('active');
+    });
+    e.target.classList.add('active');
+    if (e.target.classList.contains('left')) {
+        from = e.target.innerText;
+    } else {
+        to = e.target.innerText;
+    }
+    convertSide('l');
+}
+
+
+//inputda birdən çox nöqtə və nöqtədən sonra max 5 rəqəm olması üçün
+function inputChange(e) {
+    let v = e.target.value;
+    v = v.replace(/\s/g, '');
+    v = v.replace(',', '.');
+    v = v.replace(/[^\d.]/g, '');
+    let parts = v.split('.');
+    if (parts.length > 2) {
+        v = parts[0] + '.' + parts.slice(1).join('');
+    }
+    if (parts.length === 2 && parts[1].length > 5) {
+        v = `${parts[0]}.${parts[1].slice(0, 5)}`;
+    }
+    e.target.value = v;
+    if (e.target.classList.contains('fromInp')) {
+        convertSide('l');
+    } else {
+        convertSide('r');
+    }
+}
+
+
+
