@@ -7,48 +7,8 @@ let wifi = false;
 let currBtn = document.querySelectorAll(".buttons")
 let inputCrr = document.querySelectorAll(".inputext")
 
-
-document.addEventListener('DOMContentLoaded', function () {
-    document.querySelector('.fromInp').value = 5000;
-    document.querySelector('.toInp').value = 0;
-    getData();
-    checkConnection(); 
-    document.querySelectorAll('.buttons').forEach(b => {
-        b.addEventListener('click', btn);
-    });
-    document.querySelectorAll('.inputext').forEach(i => {
-        i.addEventListener('input', inputChange);
-    });
-    
-
-
-    //online funksiyasina w3schooldan baxdim
-    window.addEventListener('online', () => {
-        document.querySelector('.checkwifi').style.display = 'none';
-        getData();
-    });
-    
-    window.addEventListener('offline', () => {
-        document.querySelector('.checkwifi').style.display = 'block';
-        wifi = false;
-    });
-});
-
-// Interneti yoxlamaq
-function checkConnection() {
-    if (!navigator.onLine) {
-        document.querySelector('.checkwifi').style.display = 'block';
-        wifi = false;
-    }
-}
-
 //api istifadə etmək üçün
 function getData() {
-    if (!navigator.onLine) {
-        document.querySelector('.checkwifi').style.display = 'block';
-        wifi = false;
-        return;
-    }
     
     fetch(`https://v6.exchangerate-api.com/v6/${key}/latest/USD`)
         .then(r => r.json())
@@ -59,30 +19,30 @@ function getData() {
                 data.GBP = d.conversion_rates.GBP;
                 data.RUB = d.conversion_rates.RUB;
                 wifi = true;
-                convertSide('l');
+                teref('l');
                 document.querySelector('.checkwifi').style.display = 'none';
             } else {
                 document.querySelector('.checkwifi').style.display = 'block';
                 wifi = false;
             }
         })
-        .catch(() => {
-            document.querySelector('.checkwifi').style.display = 'block';
-            wifi = false;
-        });
 }
 
 
 // Aşağıdakı balaca məlumat yeri üçün
-function rateText() {
+function forcİnFo() {
     if (!wifi) return; 
     
     let a = document.querySelector('.from .currency-info');
     let b = document.querySelector('.to .currency-info');
     let rateAtoB = conv(1, from, to);
     let rateBtoA = conv(1, to, from);
-    a.innerHTML = `1 ${from} = ${formatNumber(rateAtoB)} ${to}`
-    b.innerHTML = `1 ${to} = ${formatNumber(rateBtoA)} ${from}`
+    a.innerHTML = `1 ${from} = ${nummfix(rateAtoB)} ${to}`
+
+        console.log(a.innerHTML)
+    b.innerHTML = `1 ${to} = ${nummfix(rateBtoA)} ${from}`
+        console.log(b.innerHTML)
+
 }
 
 
@@ -104,13 +64,14 @@ function conv(value, to, from) {
 
 
 //yuvarlaşdırmaq
-function formatNumber(num) {
+function nummfix(num) {
+    console.log(Math.round(num))
     return Math.round(num * 100000) / 100000;
 }
 
 
 //əsas çevrilmə işi burdadı
-function convertSide(side) {
+function teref(side) {
     if (strat|| !wifi) return; // Internet yoxdursa işləməsin
     strat= true;
     let fromInp = document.querySelector('.fromInp');
@@ -119,14 +80,14 @@ function convertSide(side) {
         let val = Number(fromInp.value.replace(',', '.'));
         if (isNaN(val)) val = 0;
         let result = conv(val, from, to);
-        toInp.value = formatNumber(result);
+        toInp.value = nummfix(result);
     } else {
         let val = Number(toInp.value.replace(',', '.'));
         if (isNaN(val)) val = 0;
         let result = conv(val, to, from);
-        fromInp.value = formatNumber(result);
+        fromInp.value = nummfix(result);
     }
-    rateText();
+    forcİnFo();
     strat= false;
 }
 
@@ -147,7 +108,7 @@ function btn(e) {
     } else {
         to = e.target.innerText;
     }
-    convertSide('l');
+    teref('l');
 }
 
 
@@ -168,8 +129,45 @@ function inputChange(e) {
     }
     e.target.value = v;
     if (e.target.classList.contains('fromInp')) {
-        convertSide('l');
+        teref('l');
     } else {
-        convertSide('r');
+        teref('r');
+    }
+
+    console.log(e.data)
+}
+
+
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelector('.fromInp').value = 5000;
+    document.querySelector('.toInp').value = 0;
+    getData();
+    checkConnection(); 
+    document.querySelectorAll('.buttons').forEach(b => {
+        b.addEventListener('click', btn);
+    });
+    document.querySelectorAll('.inputext').forEach(i => {
+        i.addEventListener('input', inputChange);
+    });
+    
+    //online funksiyasina w3schooldan baxdim aidan heçne baxmadım
+    window.addEventListener('online', () => {
+        document.querySelector('.checkwifi').style.display = 'none';
+        getData();
+    });
+    
+    window.addEventListener('offline', () => {
+        document.querySelector('.checkwifi').style.display = 'block';
+        wifi = false;
+    });
+});
+
+// Interneti yoxlamaq
+function checkConnection() {
+    if (!navigator.onLine) {
+        document.querySelector('.checkwifi').style.display = 'block';
+        wifi = false;
     }
 }
