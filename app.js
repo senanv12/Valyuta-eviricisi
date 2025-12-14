@@ -25,6 +25,7 @@ function getData() {
                 document.querySelector('.checkwifi').style.display = 'block';
                 wifi = false;
             }
+            console.log(d)
         })
 }
 
@@ -58,6 +59,7 @@ function conv(value, to, from) {
     }
 
     let inUSD = value / data[to];
+    console.log(inUSD)
     return inUSD * data[from];
 }
 
