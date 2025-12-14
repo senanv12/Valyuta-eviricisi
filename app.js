@@ -1,14 +1,14 @@
 const key = '3239d9e1d5a785f2bdcbd999';
 let data = {};
-let from = 'USD';
-let to = 'RUB';
+let from = 'RUB';
+let to = 'USD';
 let convert = false;
 let currBtn = document.querySelectorAll(".buttons")
 let inputCrr = document.querySelectorAll(".inputext")
 
 
 document.addEventListener('DOMContentLoaded', function () {
-    document.querySelector('.fromInp').value = 1;
+    document.querySelector('.fromInp').value = 5000;
     document.querySelector('.toInp').value = 0;
     getData();
     document.querySelectorAll('.buttons').forEach(b => {
