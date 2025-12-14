@@ -129,6 +129,9 @@ function inputChange(e) {
     if (parts.length === 2 && parts[1].length > 5) {
         v = `${parts[0]}.${parts[1].slice(0, 5)}`;
     }
+    if (v.length > 1 && v[0] === '0' && v[1] !== '.') {
+        v = v.replace(/^0+/, '');
+    }
     e.target.value = v;
     if (e.target.classList.contains('fromInp')) {
         teref('l');
