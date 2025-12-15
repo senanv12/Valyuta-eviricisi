@@ -4,6 +4,7 @@ let from = 'RUB';
 let to = 'USD';
 let strat= false;
 let wifi = false; 
+let lastInput = 'l';
 let currBtn = document.querySelectorAll(".buttons")
 let inputCrr = document.querySelectorAll(".inputext")
 
@@ -19,7 +20,7 @@ function getData() {
                 data.GBP = d.conversion_rates.GBP;
                 data.RUB = d.conversion_rates.RUB;
                 wifi = true;
-                teref('l');
+                teref(lastInput);
                 document.querySelector('.checkwifi').style.display = 'none';
             } else {
                 document.querySelector('.checkwifi').style.display = 'block';
@@ -105,12 +106,14 @@ function btn(e) {
         x.classList.remove('active');
     });
     e.target.classList.add('active');
+    
     if (e.target.classList.contains('left')) {
         from = e.target.innerText;
     } else {
         to = e.target.innerText;
     }
-    teref('l');
+    
+    teref(lastInput); // Son dəyişən inputdan çevir
 }
 
 
@@ -133,9 +136,12 @@ function inputChange(e) {
         v = v.replace(/^0+/, '');
     }
     e.target.value = v;
+    
     if (e.target.classList.contains('fromInp')) {
+        lastInput = 'l';
         teref('l');
     } else {
+        lastInput = 'r';
         teref('r');
     }
 
